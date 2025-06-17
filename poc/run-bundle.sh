@@ -36,6 +36,7 @@ done
 # Run tests
 bash "${SCRIPTS_DIR}/cve-2022-25237-status.sh"
 bash "${SCRIPTS_DIR}/dnl-sys-user.sh"
+bash "${SCRIPTS_DIR}/dnl-sys-group.sh"
 bash "${SCRIPTS_DIR}/abp-ext-upload.sh"
 bash "${SCRIPTS_DIR}/dnl-bd.sh"
 # End of tests
