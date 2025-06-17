@@ -92,4 +92,4 @@ bash ./run-bundle.sh # Executes set of tests
 
 You will be prompted to enter the target URL and session ID.
 
-🞯 🞯 🞯
+• • • 
