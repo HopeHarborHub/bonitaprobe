@@ -2,10 +2,10 @@
 set -e
 
 load_conf_from_env(){
-    [[ -n "${BONITA_REQUESTS_DELAY}" ]] && export BN_RQ_DElAY_TIME="${BONITA_REQUESTS_DELAY}"
-    [[ -n "${BONITA_REQUESTS_LIMIT}" ]] && export BN_RQ_LIMIT="${BONITA_REQUESTS_LIMIT}"
-    [[ -n "${BONITA_SESSION_ID}" ]] && export BN_SESS_COOKIE="JSESSIONID=${BONITA_SESSION_ID}"
-    [[ -n "${BONITA_URL}" ]] && export BN_SERVER_URL="${BONITA_URL}"
+    if [[ -n "${BONITA_REQUESTS_DELAY}" ]]; then export BN_RQ_DElAY_TIME="${BONITA_REQUESTS_DELAY}"; fi
+    if [[ -n "${BONITA_REQUESTS_LIMIT}" ]]; then export BN_RQ_LIMIT="${BONITA_REQUESTS_LIMIT}"; fi
+    if [[ -n "${BONITA_SESSION_ID}" ]]; then export BN_SESS_COOKIE="JSESSIONID=${BONITA_SESSION_ID}"; fi
+    if [[ -n "${BONITA_URL}" ]]; then export BN_SERVER_URL="${BONITA_URL}"; fi
 }
 
 print_dash_line(){
@@ -38,20 +38,26 @@ get_domain() {
     sed -E 's#^https?://([^/:]+).*$#\1#' <<< "$1"
 }
 
-get_session_status(){
+get_session_status() {
     local CURL_RESULT
     CURL_RESULT=$(curl -s -b "${BN_SESS_COOKIE}" "${URL_API_SESSION_INFO}")
-    if [ -n "${CURL_RESULT}" ] && [ "${CURL_RESULT}" != "{}" ] && [ "$(echo "${CURL_RESULT}" | jq 'has("user_id")')" = "true" ]; then
-        echo "Alive"
+    [ -z "${CURL_RESULT}" ] && echo "Not Alive" && return 0
+    if echo "${CURL_RESULT}" | jq . >/dev/null 2>&1; then
+        if [ "${CURL_RESULT}" != "{}" ] && [ "$(echo "${CURL_RESULT}" | jq 'has("user_id")')" = "true" ]; then
+            echo "Alive"
+        else
+            echo "Not Alive"
+        fi
     else
-        echo "Not Alive"
+        echo "Unable to detect"
     fi
+    return 0
 }
 
 get_user_profile_names(){
     local USER_ID=$1
     local CURL_RESULT
-    [ -z "${USER_ID}" ] && { echo "User ID required" >&2; return 1; }
+    [ -z "${USER_ID}" ] && { echo "User ID required" >&2; return 0; }
     CURL_RESULT=$(curl -s -b "${BN_SESS_COOKIE}" "$(make_url_user_profiles "${USER_ID}")")
     echo "${CURL_RESULT}" | jq -r '.[].name' 2>/dev/null | sed '/^[[:space:]]*$/d' || echo "Failed to get profile data" >&2
 }
@@ -59,17 +65,23 @@ get_user_profile_names(){
 get_session_user_id() {
     local CURL_RESULT
     CURL_RESULT=$(curl -s -b "${BN_SESS_COOKIE}" "${URL_API_SESSION_INFO}")
-    [ -z "${CURL_RESULT}" ] && { echo "Empty response" >&2; return 1; }
-    echo "${CURL_RESULT}" | jq -r '.user_id // empty' || echo "Invalid JSON"
+    [ -z "${CURL_RESULT}" ] && echo "0" && return 0
+    if echo "${CURL_RESULT}" | jq . >/dev/null 2>&1; then
+        USER_ID=$(echo "${CURL_RESULT}" | jq -r '.user_id // "0"')
+        echo "${USER_ID}"
+    else
+        echo "0"
+    fi
+    return 0
 }
 
-get_user_profiles_as_string(){
+get_user_profiles_as_string() {
     local USER_ID PROFILES_DATA
     USER_ID=$(get_session_user_id)
     PROFILES_DATA=$(get_user_profile_names "${USER_ID}")
     if [ -z "${PROFILES_DATA}" ]; then
         echo "No profiles found"
-        return 1
+        return 0
     fi
     echo "${PROFILES_DATA}" | paste -sd "," -
 }
