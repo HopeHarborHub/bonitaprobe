@@ -70,6 +70,10 @@ export BONITA_REQUESTS_DELAY=0.5
 
 Download and extract the package, for example, to the `~/bonita-tests` directory. 
 
+```shell
+mkdir -p ~/bonita-tests && cd ~/bonita-tests && git clone https://github.com/HopeHarborHub/bonitaprobe.git .
+```
+
 ### Running a Single Test
 
 This section provides an example of how to run a single test.
@@ -86,8 +90,8 @@ bash ./cve-2022-25237-status.sh # Execute CVE-2022-25237
 This section provides an example of how to execute a bundle of tests.
 
 ```bash
-cd ~/bonita-tests/poc # Open scripts directory
-bash ./run-bundle.sh # Executes set of tests
+cd ~/bonita-tests/poc # Open the scripts directory
+bash ./run-bundle.sh # Executes a set of tests
 ```
 
 You will be prompted to enter the target URL and session ID.

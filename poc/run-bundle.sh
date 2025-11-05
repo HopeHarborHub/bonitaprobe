@@ -1,5 +1,5 @@
 #!/bin/bash
-# Executes entire set of tests
+# Executes an entire set of tests
 # bash ./run-bundle.sh
 set -e
 SCRIPTS_DIR=$(dirname "$(realpath "$0")")
@@ -7,7 +7,7 @@ source "${SCRIPTS_DIR}/_const.sh"
 print_dash_line
 print_header "BUNDLE OF TESTS"
 
-# Ask for target
+# Ask for a target
 while true; do
     [ -n "${BONITA_URL}" ] && break
     read -r -p "Enter target URL: " USER_INPUT_URL

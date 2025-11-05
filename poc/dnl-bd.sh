@@ -33,7 +33,7 @@ for BD_OBJ in "${BD_OBJECTS_ARR[@]}"; do
         else
             printf "\n\t\t\t\t%s" "$([ "${PAGE}" -eq 0 ] && echo "No data" || echo "No more data")" && break
         fi
-        ((PAGE++)) # Increase page number
+        PAGE=$((PAGE + 1)) # Increase page number
     done
     # end of pages loop
 done
