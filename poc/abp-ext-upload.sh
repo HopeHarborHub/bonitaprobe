@@ -3,7 +3,7 @@
 # bash ./abp-ext-upload.sh
 source "$(dirname "$0")/_const.sh"
 set -e
-print_header "Upload BD extension and retrieve data"
+print_header "RCE: Upload BD extension and retrieve data"
 print_configuration
 print_dash_line
 
